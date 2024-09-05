@@ -1,0 +1,31 @@
+version: '3.0'
+services:
+  rasa:
+    image: rasa/rasa:3.6.20-full
+    ports:
+      - 5005:5005
+    volumes:
+      - ./rasa_bot2:/app
+    command:
+      - run
+    environment: 
+      - FLASK_APP_URL=http://flask1:5006
+    depends_on:
+      - rasa_actions
+      - flask1
+  rasa_actions:
+    image: rasa_bot2_app12:latest
+    ports:
+      - 5055:5055    
+    expose: 
+      - 5055
+  flask1:
+    build:
+      context: ./rasa_bot2/flask_rasa
+    ports:
+      - 5006:5006
+    expose: 
+      - 5006
+      
+
+

@@ -1,0 +1,91 @@
+environment:
+  FLASK_APP_URL: "http://flask_app:5006"???? solution????!!@@
+    environment: 
+      - FLASK_APP_URL=http://flask_app:5006
+	  
+	      environment:
+      - RASA_URL=http://rasa:5005  # Define Rasa URL for custom action server
+      - FLASK_APP_URL=http://flask_app:5006  # Flask app URL
+
+version: '3.0'
+services:
+  rasa:
+    image: rasa/rasa:3.6.20-full
+    ports:
+      - 5005:5005
+    volumes:
+      - ./rasa_bot2:/app
+    command:
+      - run
+    # depends_on:
+      # - app
+      # - flask_app
+  app:
+    build:
+      context: ./rasa_bot2_actions
+    # image: rasa_bot2_app:latest - old method, new method in line with flask_app below
+    ports:
+      - 5055:5055    
+    expose: 
+      -  5055
+   
+    depends_on:
+      - rasa
+  flask_app:
+    build:
+      context: ./rasa_bot2/flask_rasa
+    ports:
+      - 5006:5006
+    expose: 
+      - 5006
+    
+    depends_on:
+      - rasa
+      
+	  
+	  
+	#  ---CGPT ANNOTATED
+	  
+	  
+version: '3.0'  # Specifies the version of Docker Compose syntax. Version 3 is commonly used for compatibility with Docker Swarm.
+
+services:
+  rasa:  # This defines the Rasa service that will run in a container.
+    image: rasa/rasa:3.6.20-full  # Specifies the Docker image to use. In this case, it's the full Rasa image version 3.6.20.
+    ports:
+      - 5005:5005  # Maps port 5005 inside the container to port 5005 on the host, allowing communication with Rasa.
+    volumes:
+      - ./rasa_bot2:/app  # Mounts the local `rasa_bot2` folder to `/app` inside the container to provide persistent storage and access to project files.
+    command:
+      - run  # The command to run when the container starts. In this case, it tells Rasa to run in server mode.
+    # depends_on:
+      # - app
+      # - flask_app
+    # Commented out `depends_on` to remove any unnecessary circular dependency between services.
+
+  app:  # This defines the service for running custom Rasa actions (defined in the `rasa_bot2_actions` directory).
+    build:
+      context: ./rasa_bot2_actions  # Specifies that the Dockerfile inside `rasa_bot2_actions` will be used to build this service.
+    # image: rasa_bot2_app:latest - old method, new method in line with flask_app below
+    ports:
+      - 5055:5055  # Exposes port 5055 from the container to the host, which is used by the Rasa actions server.
+    expose: 
+      -  5055  # Internal exposure of port 5055 for communication between services.
+   
+    depends_on:
+      - rasa  # Ensures the Rasa service is started before this action server, as it depends on Rasa.
+
+  flask_app:  # Defines the Flask web application service that communicates with the Rasa service.
+    build:
+      context: ./rasa_bot2/flask_rasa  # Specifies the build context for Flask, pointing to `rasa_bot2/flask_rasa` where the Dockerfile is located.
+    ports:
+      - 5006:5006  # Exposes port 5006 on the host to allow access to the Flask web app.
+    expose: 
+      - 5006  # Exposes port 5006 internally so other services can communicate with the Flask app.
+
+    depends_on:
+      - rasa  # Ensures the Flask service starts after the Rasa server.
+
+      
+
+

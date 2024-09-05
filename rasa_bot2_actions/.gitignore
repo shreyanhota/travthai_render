@@ -1,0 +1,11 @@
+__pycache__/
+empenv/
+.rasa/
+.keras/
+myenv/
+models/
+rasa_bot2/.rasa/
+Rasa_bot/
+*.pyc
+.env
+flask_rasa/
